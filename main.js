@@ -3,34 +3,42 @@ const EMPTY_HEART = '♡'
 const FULL_HEART = '♥'
 
 // Your JavaScript code goes here!
-document.addEventListener('DOMContentLoaded',function(e){
+let errorModal = document.querySelector('#modal')
+let modalMessage = document.querySelector('#modal-message')
+let likeBtns = document.querySelectorAll('.like')
+let hearts = document.querySelectorAll('.like-glyph')
 
-  let hide = document.getElementById('modal')
-  hide.className = 'hidden'
-document.addEventListener('click', function(e){
-    if (e.target.classList.contains('like-glyph')){
-    mimicServerCall()
-    .then(()=>{
-      // e.target.innerText = e.target.innerText === EMPTY_HEART?FULL_HEART:EMPTY_HEART;
-      if ( e.target.innerText === FULL_HEART){
-      e.target.classList.remove('activated-heart');
-      e.target.innerText = EMPTY_HEART;
+hideModal()
 
+function changeHeart(target) {
+  for (heart of hearts){
+    if (target.innerText == EMPTY_HEART) {
+      target.innerText = FULL_HEART;
+      target.classList.add('activated-heart')
     } else {
-      e.target.classList.add('activated-heart');
-      e.target.innerText = FULL_HEART;
-
+      target.innerText = EMPTY_HEART;
+      target.classList.remove('activated-heart')
     }
-    })
-    .catch((err)=>{
-      hide.className = ''
-      hide.innerText = err
-      setTimeout(function(){ hide.className = 'hidden'; }, 5000);
-        })
+  }
+}
 
-    }
-})
-})
+for (btn of likeBtns) {
+  btn.addEventListener('click', (e) => {
+    mimicServerCall()
+      .then(() => {
+        changeHeart(e.target)
+      })
+      .catch((error) => {
+        errorModal.classList.remove('hidden')
+        modalMessage.innerText = error
+        setTimeout(hideModal, 5000);
+      })
+  })
+}
+
+function hideModal() {
+  errorModal.classList.add('hidden');
+}
 
 //------------------------------------------------------------------------------
 // Ignore after this point. Used only for demo purposes
